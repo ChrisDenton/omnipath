@@ -80,13 +80,16 @@ pub fn sys_absolute(path: &std::path::Path) -> std::io::Result<std::path::PathBu
 ///
 /// # Example
 ///
-/// ```
+/// ```no_run
 /// use omnipath::sys_canonicalize;
 /// use std::path::Path;
 /// use std::env::current_dir;
-/// let path = Path::new(r"path/to/file");
 ///
+/// # fn main() -> std::io::Result<()> {
+/// let path = Path::new(r"path/to/file");
 /// let canonical = sys_canonicalize(path)?;
+/// # Ok(())
+/// # }
 /// ```
 #[cfg(feature = "std")]
 pub fn sys_canonicalize(path: &std::path::Path) -> std::io::Result<std::path::PathBuf> {
