@@ -1,0 +1,6 @@
+[book]
+authors = ["Chris Denton"]
+language = "en"
+multilingual = false
+src = "src"
+title = "An In-Depth Guide to Windows File Paths"
