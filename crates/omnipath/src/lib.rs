@@ -72,3 +72,26 @@ pub fn sys_absolute(path: &std::path::Path) -> std::io::Result<std::path::PathBu
 	#[cfg(windows)]
 	return WinPathExt::win_absolute(path);
 }
+
+/// Canonicalizes a path.
+///
+/// This is the same as [`std::fs::canonicalize`] but on Windows this attempts
+/// to not return verbatim paths.
+///
+/// # Example
+///
+/// ```
+/// use omnipath::sys_canonicalize;
+/// use std::path::Path;
+/// use std::env::current_dir;
+/// let path = Path::new(r"path/to/file");
+///
+/// let canonical = sys_canonicalize(path)?;
+/// ```
+#[cfg(feature = "std")]
+pub fn sys_canonicalize(path: &std::path::Path) -> std::io::Result<std::path::PathBuf> {
+	#[cfg(unix)]
+	return path.canonicalize();
+	#[cfg(windows)]
+	return path.canonicalize()?.to_winuser_path();
+}
