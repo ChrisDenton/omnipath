@@ -1,8 +1,13 @@
 [package]
 name = "omnipath"
-description = "path library"
-version = "0.0.0"
+description = "Path utlity library"
+version = "0.1.0"
 edition = "2021"
 license = "MIT OR Apache-2.0"
 keywords = ["windows", "absolute"]
 categories = ["filesystem"]
+repository = "https://github.com/ChrisDenton/omnipath"
+
+[features]
+default = ["std"]
+std = []
