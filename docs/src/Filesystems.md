@@ -10,7 +10,7 @@ Microsoft's filesystem drivers will typically not allow the following characters
 |`:`|Dos drive and NTFS file stream separator|
 |`*` `?`|Wildcards|
 |`<` `>` `"`|DOS wildcards|
-|`\|`|Pipe|
+|<code>\|</code>|Pipe|
 |`NUL` to `US`|ASCII control codes; aka Unicode C0 control codes (U+0000 to U+001F inclusive). Note that `DEL` (U+007F) is allowed.|
 
 Each component in a path is currently limited to 255 UTF-16 code units. However, it may not be safe to rely on this.
