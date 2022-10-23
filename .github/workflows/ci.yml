@@ -1,0 +1,49 @@
+name: Rust
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  test:
+    strategy:
+      matrix:
+        channel: ["stable", "1.63", "nightly"]
+        os: [windows-latest, windows-2019, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Install
+      run: rustup install ${{ matrix.channel }}
+    - name: Set toolchain to default
+      run: rustup override set ${{ matrix.channel }}
+    - name: Build
+      run: cargo build --verbose --all-features
+    - name: Run tests
+      run: cargo test --verbose --all-features
+  check:
+    strategy:
+      matrix:
+        os: [windows-latest, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    
+    steps:
+    - uses: actions/checkout@v3
+    - name: Install nightly
+      run: rustup install nightly
+    - name: Install rustfmt
+      run: rustup component add rustfmt --toolchain nightly
+    - name: Install clippy
+      run: rustup component add clippy --toolchain nightly
+    - name: Set toolchain to default
+      run: rustup override set nightly
+    - name: Format
+      run: cargo fmt --verbose --check
+    - name: Clippy
+      run: cargo clippy --verbose --all-targets --all-features -- -Dwarnings
