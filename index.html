@@ -1,0 +1,218 @@
+<!DOCTYPE HTML>
+<html lang="en" class="sidebar-visible no-js light">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Overview - An In-Depth Guide to Windows File Paths</title>
+        <!-- Custom HTML head -->
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        <link rel="icon" href="favicon.svg">
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="fonts/fonts.css">
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+    </head>
+    <body>
+        <!-- Provide site root to javascript -->
+        <script type="text/javascript">
+            var path_to_root = "";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded "><a href="Overview.html"><strong aria-hidden="true">1.</strong> Overview</a></li><li class="chapter-item expanded "><a href="Details.html"><strong aria-hidden="true">2.</strong> Parsing Details</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="NT.html"><strong aria-hidden="true">2.1.</strong> NT Kernel Paths</a></li><li class="chapter-item expanded "><a href="Strings.html"><strong aria-hidden="true">2.2.</strong> Strings</a></li><li class="chapter-item expanded "><a href="Filesystems.html"><strong aria-hidden="true">2.3.</strong> Filesystems</a></li><li class="chapter-item expanded "><a href="Win32.html"><strong aria-hidden="true">2.4.</strong> Win32 Paths</a></li><li class="chapter-item expanded "><a href="Special Dos Device Names.html"><strong aria-hidden="true">2.5.</strong> Special Dos Device Names</a></li></ol></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky bordered">
+                    <div class="left-buttons">
+                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light (default)</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">An In-Depth Guide to Windows File Paths</h1>
+
+                    <div class="right-buttons">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="overview"><a class="header" href="#overview">Overview</a></h1>
+<h2 id="win32-paths"><a class="header" href="#win32-paths">Win32 Paths</a></h2>
+<p><a href="./Win32.html">Win32 paths</a> are a living history of Microsoft OSes from DOS 1.0 through Windows 95/NT and modern Windows.</p>
+<h3 id="absolute-win32-paths"><a class="header" href="#absolute-win32-paths">Absolute Win32 paths</a></h3>
+<table><thead><tr><th>Type</th><th>Examples</th></tr></thead><tbody>
+<tr><td>Drive</td><td><code>C:\Windows</code></td></tr>
+<tr><td><abbr title="Universal Naming Convention">UNC</abbr></td><td><code>\\server\share\</code></td></tr>
+<tr><td>Device</td><td><code>\\.\PIPE\name</code></td></tr>
+<tr><td>Verbatim</td><td><code>\\?\C:\Windows</code><br><code>\\?\UNC\server\share\</code><br><code>\\?\PIPE\name</code></td></tr>
+</tbody></table>
+<h3 id="relative-win32-paths"><a class="header" href="#relative-win32-paths">Relative Win32 paths</a></h3>
+<table><thead><tr><th>Type</th><th>Examples</th></tr></thead><tbody>
+<tr><td>Path Relative</td><td><code>file.ext</code><br><code>.\file.ext</code><br><code>..\file.ext</code></td></tr>
+<tr><td>Root Relative</td><td><code>\file.ext</code></td></tr>
+<tr><td>Drive Relative</td><td><code>D:file.ext</code></td></tr>
+</tbody></table>
+<h2 id="path-character-encoding"><a class="header" href="#path-character-encoding">Path character encoding</a></h2>
+<p>Paths are <a href="./Strings.html">UTF-16 strings</a>. Windows allows using other encodings (including UTF-8) but these are all lossily converted to and from UTF-16.</p>
+<h2 id="disallowed-characters"><a class="header" href="#disallowed-characters">Disallowed characters</a></h2>
+<p><a href="./Filesystems.html">Filesystem drivers</a> typically disallow the following characters in path components:</p>
+<table><thead><tr><th>Disallowed</th><th>Description</th></tr></thead><tbody>
+<tr><td><code>\</code> <code>/</code></td><td>Path seperators</td></tr>
+<tr><td><code>:</code></td><td>Dos drive and NTFS file stream separator</td></tr>
+<tr><td><code>*</code> <code>?</code></td><td>Wildcards</td></tr>
+<tr><td><code>&lt;</code> <code>&gt;</code> <code>&quot;</code></td><td>DOS wildcards</td></tr>
+<tr><td><code>|</code></td><td>Pipe</td></tr>
+<tr><td><code>NUL</code> to <code>US</code></td><td>ASCII control codes; aka Unicode C0 control codes (U+0000 to U+001F inclusive). Note that <code>DEL</code> (U+007F) is allowed.</td></tr>
+</tbody></table>
+<p>Note that path separators and wildcards must be disallowed in normal filesystems otherwise some Win32 APIs will be unusable in some situations.</p>
+<h2 id="special-dos-device-names"><a class="header" href="#special-dos-device-names">Special Dos Device Names</a></h2>
+<p>For legacy reasons, some filenames may be interpreted as <a href="./Special%20Dos%20Device%20Names.html">DOS devices</a>. This means, for example the path &quot;AUX&quot; will be rewritten as <code>\\.\AUX</code>.</p>
+<p>The following are special dos device names:</p>
+<ul>
+<li><code>AUX</code></li>
+<li><code>CON</code></li>
+<li><code>CONIN$</code></li>
+<li><code>CONOUT$</code></li>
+<li><code>COM1</code>, <code>COM2</code>, <code>COM3</code>, <code>COM4</code>, <code>COM5</code>, <code>COM6</code>, <code>COM7</code>, <code>COM8</code>, <code>COM9</code>, <code>COM²</code>, <code>COM³</code>, <code>COM¹</code></li>
+<li><code>LPT1</code>, <code>LPT2</code>, <code>LPT3</code>, <code>LPT4</code>, <code>LPT5</code>, <code>LPT6</code>, <code>LPT7</code>, <code>LPT8</code>, <code>LPT9</code>, <code>LPT²</code>, <code>LPT³</code>, <code>LPT¹</code></li>
+<li><code>NUL</code></li>
+<li><code>PRN</code></li>
+</ul>
+<p>Note that these names are case-insensitive though canonically they're uppercase.</p>
+<h2 id="under-the-hood"><a class="header" href="#under-the-hood">Under the hood</a></h2>
+<p>Win32 paths are emulated on top of <a href="./NT.html">NT kernel paths</a>. An NT path looks similar to a Unix path, except for the directory separator. For example:</p>
+<pre><code>\Device\HarddiskVolume2\directory\subdir\file.ext
+</code></pre>
+<p>These types of paths cannot be used directly in the Win32 API but can make themsevles apparent in other ways.</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="next" href="Details.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="next" href="Details.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+        <script type="text/javascript">
+            window.playground_copyable = true;
+        </script>
+        <script src="elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="mark.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="searcher.js" type="text/javascript" charset="utf-8"></script>
+        <script src="clipboard.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="highlight.js" type="text/javascript" charset="utf-8"></script>
+        <script src="book.js" type="text/javascript" charset="utf-8"></script>
+
+        <!-- Custom JS scripts -->
+    </body>
+</html>

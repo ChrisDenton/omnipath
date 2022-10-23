@@ -1,0 +1,245 @@
+<!DOCTYPE HTML>
+<html lang="en" class="sidebar-visible no-js light">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Win32 Paths - An In-Depth Guide to Windows File Paths</title>
+        <!-- Custom HTML head -->
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        <link rel="icon" href="favicon.svg">
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="fonts/fonts.css">
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+    </head>
+    <body>
+        <!-- Provide site root to javascript -->
+        <script type="text/javascript">
+            var path_to_root = "";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded "><a href="Overview.html"><strong aria-hidden="true">1.</strong> Overview</a></li><li class="chapter-item expanded "><a href="Details.html"><strong aria-hidden="true">2.</strong> Parsing Details</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="NT.html"><strong aria-hidden="true">2.1.</strong> NT Kernel Paths</a></li><li class="chapter-item expanded "><a href="Strings.html"><strong aria-hidden="true">2.2.</strong> Strings</a></li><li class="chapter-item expanded "><a href="Filesystems.html"><strong aria-hidden="true">2.3.</strong> Filesystems</a></li><li class="chapter-item expanded "><a href="Win32.html" class="active"><strong aria-hidden="true">2.4.</strong> Win32 Paths</a></li><li class="chapter-item expanded "><a href="Special Dos Device Names.html"><strong aria-hidden="true">2.5.</strong> Special Dos Device Names</a></li></ol></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky bordered">
+                    <div class="left-buttons">
+                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light (default)</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">An In-Depth Guide to Windows File Paths</h1>
+
+                    <div class="right-buttons">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="win32-paths"><a class="header" href="#win32-paths">Win32 Paths</a></h1>
+<p>The Win32 API is built as a layer on top of the NT kernel. It implements an API that was originally built for those familiar with Win16 and DOS so it doesn't directly deal with NT paths. Instead it converts Win32 paths to NT paths before calling the kernel.</p>
+<p>Essentially Win32 paths are a user-space compatibility layer.</p>
+<h3 id="absolute-win32-paths"><a class="header" href="#absolute-win32-paths">Absolute Win32 paths</a></h3>
+<p>All absolute paths start with a root. On *nix the root is <code>/</code>. For the NT kernel it's <code>\</code>. In contrast, Win32 has four types of root and they're all longer than one character.</p>
+<ul>
+<li><code>C:\</code>, <code>D:\</code>, <code>E:\</code>, etc. The first letter is a (case insensitive) drive letter that can be any ascii letter from <code>A</code> to <code>Z</code>.</li>
+<li><code>\\server\share\</code> where <code>server</code> is the name of the server and <code>share</code> is the name of the shared directory. It is used to access a shared directory on a server therefore you must always specifiy both a server name and share name.</li>
+<li><code>\\.\</code>. These are typically used to access devices other than drives or server shares (e.g. named pipes). So they are not usually filesystem paths.</li>
+<li><code>\\?\</code>. These can be used to access any type of device.</li>
+</ul>
+<p>The following table shows each type and an example of how the Win32 root is converted to a kernel path.</p>
+<table><thead><tr><th>Type</th><th>Win32 path</th><th>Kernel path</th></tr></thead><tbody>
+<tr><td>Drive</td><td><code>C:\Windows</code></td><td><code>\??\C:\Windows</code></td></tr>
+<tr><td><abbr title="Universal Naming Convention">UNC</abbr></td><td><code>\\server\share\file</code></td><td><code>\??\UNC\server\share\file</code></td></tr>
+<tr><td>Device</td><td><code>\\.\PIPE\name</code></td><td><code>\??\PIPE\name</code></td></tr>
+<tr><td>Verbatim</td><td><code>\\?\C:\Windows</code><br><code>\\?\UNC\server\share\file</code><br><code>\\?\PIPE\name</code></td><td><code>\??\C:\Windows</code><br><code>\??\UNC\server\share\file</code><br><code>\??\PIPE\name</code></td></tr>
+</tbody></table>
+<p>From the table above it looks like device paths and verbatim paths work the same way. However, that's only because I left off a column: the namespace. The namespace determines what happens to the part of the path after the root. </p>
+<table><thead><tr><th>Type</th><th>Namespace</th><th>Example</th></tr></thead><tbody>
+<tr><td>Drive</td><td>Win32</td><td><code>C:\Windows</code></td></tr>
+<tr><td><abbr title="Universal Naming Convention">UNC</abbr></td><td>Win32</td><td><code>\\server\share\file</code></td></tr>
+<tr><td>Device</td><td>Win32</td><td><code>\\.\PIPE\name</code></td></tr>
+<tr><td>Verbatim</td><td>NT</td><td><code>\\?\C:\Windows</code><br><code>\\?\UNC\server\share\file</code><br><code>\\?\PIPE\name</code></td></tr>
+</tbody></table>
+<p>The next two sections will explain the effects the namespace has.</p>
+<h3 id="nt-namespace"><a class="header" href="#nt-namespace">NT namespace</a></h3>
+<p>Paths in the NT namespace are passed almost directly to the kernel without any transformations or substitutions.</p>
+<p>The only Win32 paths in the NT namespace are verbatim paths (i.e. those that start with <code>\\?\</code>). When converting a verbatim path to a kernel path, all that happens is the root <code>\\?\</code> is changed to the kernel path <code>\??\</code>. The rest of the path is left untouched. See <a href="./NT.html">NT Kernel Paths</a> for more on kernel paths.</p>
+<p>Note that this is the only way to use kernel paths in the Win32 API. If you start a path with <code>\??\</code> or <code>\Device\</code> then it can have very different results.</p>
+<h3 id="win32-namespace"><a class="header" href="#win32-namespace">Win32 namespace</a></h3>
+<p>This section applies to all Win32 paths except for verbatim paths (those that start with <code>\\?\</code>).</p>
+<p>When converting a Win32 path to a kernel path there are additional transformations and restrictions that are applied to DOS drive paths, UNC paths and Device paths. Some of these transformations are useful while others are an unfortunate holdover from DOS or early Windows.</p>
+<p>Win32 namespaced paths are restricted to a length less than 260 UTF-16 code units. This restriction can be lifted on newer versions of Windows 10 but it requires both the user and the application to opt in.</p>
+<p>When paths are in this namespace, one of two transformations may happen:</p>
+<ul>
+<li>If the path is a special DOS device name then a device path is returned. See <a href="./Special%20Dos%20Device%20Names.html">Special Dos Device Names</a> for details.</li>
+<li>Otherwise the following transformations are applied:
+<ul>
+<li>First, all occurences of <code>/</code> are changed to <code>\</code>.</li>
+<li>All path components consisting of only a single <code>.</code> are removed.</li>
+<li>A sequence containing more than one <code>\</code> is replaced with a single <code>\</code>. E.g. <code>\\\</code> is collapsed to <code>\</code>.</li>
+<li>All <code>..</code> path components will be removed along with their parent component. The Win32 root (e.g. <code>C:\</code>, <code>\\server\share</code>, <code>\\.\</code>) will never be removed.</li>
+<li>If a component name ends with a <code>.</code> then the final <code>.</code> is removed, unless another <code>.</code> comes before it. So <code>dir.</code> becomes <code>dir</code> but <code>dir..</code> remains as it is. I'm sure there's a reason for this.</li>
+<li>For the filename only (aka the last component), all trailing dots and spaces are stripped.</li>
+</ul>
+</li>
+</ul>
+<p>For example, this:</p>
+<pre><code>C:/path////../../../to/.////file.. ..
+</code></pre>
+<p>Is changed to:</p>
+<pre><code>C:\to\file
+</code></pre>
+<p>Which becomes the kernel path:</p>
+<pre><code>\??\C:\to\file
+</code></pre>
+<p>This transformation all happens without touching the filesystem.</p>
+<h3 id="relative-win32-paths"><a class="header" href="#relative-win32-paths">Relative Win32 paths</a></h3>
+<p>Relative paths are usually resolved relative to the current directory. The current directory is a global mutable value that stores an absolute Win32 path to an existing directory. The current directory only supports DOS drive paths (e.g. <code>C:\</code>) and UNC paths (e.g. <code>\\server\share</code>). Using any other path type when setting the current directory is liable to break relative paths therefore verbatim paths (<code>\\?\</code>) should not be used.</p>
+<p>There are three categories of relative Win32 paths.</p>
+<table><thead><tr><th>Type</th><th>Examples</th></tr></thead><tbody>
+<tr><td>Path Relative</td><td><code>file.ext</code><br><code>.\file.ext</code><br><code>..\file.ext</code></td></tr>
+<tr><td>Root Relative</td><td><code>\file.ext</code></td></tr>
+<tr><td>Drive Relative</td><td><code>D:file.ext</code></td></tr>
+</tbody></table>
+<p>Although Path Relative forms come in three flavours there are really only two. <code>file.txt</code> is interpreted exactly the same way as <code>.\file.txt</code> (see Win32 namespace). However, the <code>.\</code> prefix can help to avoid ambiguities introduced by drive relative paths.</p>
+<p>Drive Relative paths are interpreted as being relative to the specified drive's current directory (note: usually only the command prompt has per drive current directories). Root relative are relative to the root of the current directory.</p>
+<p>Drive Relative and Root Relative paths should be avoided whenever possible. Developers and users rarely understand how they're resolved so their results can be surprising. Additionally the Drive Relative paths syntax introduces ambiguity with file streams.</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="Filesystems.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+                            <a rel="next" href="Special Dos Device Names.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="Filesystems.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+                    <a rel="next" href="Special Dos Device Names.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+        <script type="text/javascript">
+            window.playground_copyable = true;
+        </script>
+        <script src="elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="mark.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="searcher.js" type="text/javascript" charset="utf-8"></script>
+        <script src="clipboard.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="highlight.js" type="text/javascript" charset="utf-8"></script>
+        <script src="book.js" type="text/javascript" charset="utf-8"></script>
+
+        <!-- Custom JS scripts -->
+    </body>
+</html>
