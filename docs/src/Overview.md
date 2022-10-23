@@ -35,7 +35,7 @@ Paths are [UTF-16 strings](./Strings.md). Windows allows using other encodings (
 |`:`|Dos drive and NTFS file stream separator|
 |`*` `?`|Wildcards|
 |`<` `>` `"`|DOS wildcards|
-|`|`|Pipe|
+|<code>\|</code>|Pipe|
 |`NUL` to `US`|ASCII control codes; aka Unicode C0 control codes (U+0000 to U+001F inclusive). Note that `DEL` (U+007F) is allowed.|
 
 Note that path separators and wildcards must be disallowed in normal filesystems otherwise some Win32 APIs will be unusable in some situations.
