@@ -1,3 +1,7 @@
+use alloc::string::String;
+use alloc::vec;
+use alloc::vec::Vec;
+
 // Quick macro for case-insensitive comparisons.
 // Also converts
 // FIXME: This should probably be replaced with uppercasing to a stack buffer.
@@ -93,3 +97,31 @@ pub const fn bmp_utf8_to_utf16(bytes: &[u8]) -> u16 {
 		_ => bytes[0] as u16,
 	}
 }
+/*
+#[derive(Debug)]
+pub struct StringBuilder {
+	string: Vec<u8>,
+	pos: usize,
+}
+impl StringBuilder {
+	pub fn with_capacity(capacity: usize) -> Self {
+		Self { string: vec![0u8; capacity], pos: capacity }
+	}
+	#[track_caller]
+	pub fn reverse_push(&mut self, s: &str) {
+		self.pos -= s.len();
+		self.string[self.pos..self.pos + s.len()].copy_from_slice(s.as_bytes());
+	}
+	pub fn is_empty(&self) -> bool {
+		self.pos == self.string.capacity()
+	}
+	pub fn finalize(self) -> String {
+		let Self { mut string, pos } = self;
+		if pos > 0 {
+			string.copy_within(pos.., 0);
+			string.truncate(string.len() - pos);
+		}
+		String::from_utf8(string).unwrap()
+	}
+}
+*/
