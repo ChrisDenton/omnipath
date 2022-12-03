@@ -21,6 +21,9 @@
 |Root Relative|`\file.ext`|
 |Drive Relative|`D:file.ext`|
 
+Root relative and drive relative paths are a legacy of the command prompt.
+If these occur in a settings file, they should probably be rejected as invalid.
+
 ## Path character encoding
 
 Paths are [UTF-16 strings](./Strings.md). Windows allows using other encodings (including UTF-8) but these are all lossily converted to and from UTF-16.
