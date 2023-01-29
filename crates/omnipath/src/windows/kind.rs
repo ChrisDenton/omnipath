@@ -27,7 +27,7 @@ impl<'a> ParsedUtf8Path<'a> {
 		}
 	}
 
-	/// Get the orginal, unparsed path.
+	/// Get the original, unparsed path.
 	pub fn as_utf8(&self) -> &str {
 		self.path
 	}
