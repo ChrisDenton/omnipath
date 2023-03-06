@@ -67,10 +67,10 @@ pub use windows::WinPathExt;
 /// ```
 #[cfg(feature = "std")]
 pub fn sys_absolute(path: &std::path::Path) -> std::io::Result<std::path::PathBuf> {
-	#[cfg(unix)]
-	return PosixPathExt::posix_absolute(path);
-	#[cfg(windows)]
-	return WinPathExt::win_absolute(path);
+    #[cfg(unix)]
+    return PosixPathExt::posix_absolute(path);
+    #[cfg(windows)]
+    return WinPathExt::win_absolute(path);
 }
 
 /// Canonicalizes a path.
@@ -93,8 +93,8 @@ pub fn sys_absolute(path: &std::path::Path) -> std::io::Result<std::path::PathBu
 /// ```
 #[cfg(feature = "std")]
 pub fn sys_canonicalize(path: &std::path::Path) -> std::io::Result<std::path::PathBuf> {
-	#[cfg(unix)]
-	return path.canonicalize();
-	#[cfg(windows)]
-	return path.canonicalize()?.to_winuser_path();
+    #[cfg(unix)]
+    return path.canonicalize();
+    #[cfg(windows)]
+    return path.canonicalize()?.to_winuser_path();
 }
