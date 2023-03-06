@@ -1,5 +1,5 @@
 edition = "2021"
 newline_style = "Unix"
-hard_tabs = true
+hard_tabs = false
 use_field_init_shorthand = true
 use_small_heuristics = "Max"
