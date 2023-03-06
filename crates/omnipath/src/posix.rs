@@ -56,9 +56,73 @@ pub trait PosixPathExt: Sealed {
 	/// }
 	/// ```
 	fn posix_lexically_absolute(&self) -> io::Result<PathBuf>;
+
+	/// [Unix only] Make a POSIX path absolute relative to a provided working
+	/// directory without changing its semantics.
+	///
+	/// See [`PosixPathExt::posix_absolute`] for a version of this function that
+	/// is relative to [`std::env::current_dir()`] instead.
+	///
+	/// # Example
+	///
+	/// ```
+	/// #[cfg(unix)]
+	/// {
+	///     use omnipath::posix::PosixPathExt;
+	///     use std::path::Path;
+	///     let working_dir = Path::new("/tmp");
+	///     let path = Path::new("path/to/..//./file");
+	///
+	///     assert_eq!(
+	///         &path.posix_absolute_from(working_dir),
+	///         Path::new("/tmp/path/to/../file"),
+	///     )
+	/// }
+	/// ```
+	fn posix_absolute_from(&self, path: &Path) -> PathBuf;
+
+	/// [Unix only] Make a POSIX path lexically absolute relative to a provided
+	/// current working directory.
+	///
+	/// Unlike `canonicalize` the path does not need to exist. Symlinks will not be resolved.
+	/// Unlike [`posix_absolute`] this resolves `..` components by popping the
+	/// parent component. This means that it may resolve to a different path
+	/// than would be resolved by passing the path directly to the OS.
+	///
+	/// Usually this is not the preferred behaviour.
+	///
+	/// See [`PosixPathExt::posix_lexically_absolute`] for a version of this function that
+	/// is relative to [`std::env::current_dir()`] instead.
+	///
+	/// # Example
+	///
+	/// ```
+	/// #[cfg(unix)]
+	/// {
+	///     use omnipath::posix::PosixPathExt;
+	///     use std::path::Path;
+	///     use std::env::current_dir;
+	///		let root = Path::new("/tmp");
+	///     let path = Path::new(r"path/to/..//./file");
+	///     assert_eq!(
+	///         &path.posix_lexically_absolute_from(root),
+	///         Path::new("/tmp/path/file")
+	///     )
+	/// }
+	/// ```
+	fn posix_lexically_absolute_from(&self, cwd: &Path) -> PathBuf;
 }
+
 impl PosixPathExt for Path {
 	fn posix_absolute(&self) -> io::Result<PathBuf> {
+		Ok(self.posix_absolute_from(&env::current_dir()?))
+	}
+
+	fn posix_lexically_absolute(&self) -> io::Result<PathBuf> {
+		Ok(self.posix_lexically_absolute_from(&env::current_dir()?))
+	}
+
+	fn posix_absolute_from(&self, cwd: &Path) -> PathBuf {
 		// This is mostly a wrapper around collecting `Path::components`, with
 		// exceptions made where this conflicts with the POSIX specification.
 		// See 4.13 Pathname Resolution, IEEE Std 1003.1-2017
@@ -81,7 +145,7 @@ impl PosixPathExt for Path {
 				PathBuf::new()
 			}
 		} else {
-			env::current_dir()?
+			cwd.into()
 		};
 		normalized.extend(components);
 
@@ -95,9 +159,10 @@ impl PosixPathExt for Path {
 			normalized.push("");
 		}
 
-		Ok(normalized)
+		normalized
 	}
-	fn posix_lexically_absolute(&self) -> io::Result<PathBuf> {
+
+	fn posix_lexically_absolute_from(&self, cwd: &Path) -> PathBuf {
 		// This is mostly a wrapper around collecting `Path::components`, with
 		// exceptions made where this conflicts with the POSIX specification.
 		// See 4.13 Pathname Resolution, IEEE Std 1003.1-2017
@@ -120,7 +185,7 @@ impl PosixPathExt for Path {
 				PathBuf::new()
 			}
 		} else {
-			env::current_dir()?
+			cwd.into()
 		};
 		components.for_each(|component| {
 			if component == Component::ParentDir {
@@ -140,7 +205,7 @@ impl PosixPathExt for Path {
 			normalized.push("");
 		}
 
-		Ok(normalized)
+		normalized
 	}
 }
 
