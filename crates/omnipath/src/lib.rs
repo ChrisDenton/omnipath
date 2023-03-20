@@ -83,7 +83,6 @@ pub fn sys_absolute(path: &std::path::Path) -> std::io::Result<std::path::PathBu
 /// ```no_run
 /// use omnipath::sys_canonicalize;
 /// use std::path::Path;
-/// use std::env::current_dir;
 ///
 /// # fn main() -> std::io::Result<()> {
 /// let path = Path::new(r"path/to/file");
