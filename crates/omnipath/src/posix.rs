@@ -33,7 +33,7 @@ pub trait PosixPathExt: Sealed {
     /// [Unix only] Make a POSIX path lexically absolute.
     ///
     /// Unlike `canonicalize` the path does not need to exist. Symlinks will not be resolved.
-    /// Unlike [`posix_absolute`] this resolves `..` components by popping the
+    /// Unlike [`posix_absolute`][PosixPathExt::posix_absolute] this resolves `..` components by popping the
     /// parent component. This means that it may resolve to a different path
     /// than would be resolved by passing the path directly to the OS.
     ///
@@ -100,7 +100,7 @@ pub trait PosixPathExt: Sealed {
     /// current working directory.
     ///
     /// Unlike `canonicalize` the path does not need to exist. Symlinks will not be resolved.
-    /// Unlike [`posix_absolute`] this resolves `..` components by popping the
+    /// Unlike [`posix_absolute`][PosixPathExt::posix_absolute] this resolves `..` components by popping the
     /// parent component. This means that it may resolve to a different path
     /// than would be resolved by passing the path directly to the OS.
     ///
