@@ -131,6 +131,14 @@ pub trait WinPathExt: Sealed {
     ///         path.to_verbatim().unwrap(),
     ///         Path::new(r"\\?\pipe\name")
     ///     );
+    ///
+    ///     // Using `NUL` in the path would usually redirect to
+    ///     // `\\.\NUL`. But converting to a verbatim path allows it.
+    ///     let path = Path::new(r"C:\path\to\NUL");
+    ///     assert_eq!(
+    ///         path.to_verbatim().unwrap(),
+    ///         Path::new(r"\\?\C:\path\to\NUL")
+    ///     );
     /// }
     /// ```
     fn to_verbatim(&self) -> io::Result<PathBuf>;
@@ -218,7 +226,14 @@ impl WinPathExt for Path {
                 return Ok(self.into());
             }
         }
-        let path = to_wide(self)?;
+
+        let mut path = to_wide(self)?;
+        let ends_with_sep = path.ends_with(&[b'\\' as u16, 0]) || path.ends_with(&[b'/' as u16, 0]);
+        if !ends_with_sep {
+            path.pop();
+            path.push(b'\\' as u16);
+            path.push(0);
+        }
         absolute_inner(&path, |mut absolute| {
             const VERBATIM_PREFIX: &str = r"\\?\";
             const UNC_PREFIX: &str = r"\\?\UNC\";
@@ -245,6 +260,9 @@ impl WinPathExt for Path {
                 // Anything else we leave alone.
                 _ => "",
             };
+            if !ends_with_sep && absolute.ends_with(&[b'\\' as u16]) {
+                absolute = &absolute[..absolute.len() - 1];
+            }
             let path = OsString::from_wide(absolute);
             let mut absolute = OsString::from(prefix);
             absolute.push(path);
