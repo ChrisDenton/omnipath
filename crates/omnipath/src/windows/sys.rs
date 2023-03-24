@@ -91,6 +91,49 @@ pub trait WinPathExt: Sealed {
     /// }
     /// ```
     fn to_winuser_path(&self) -> io::Result<PathBuf>;
+
+    /// Create a verbatim path.
+    ///
+    /// Useful for passing exact paths to the Windows API. Otherwise paths are lossy
+    /// (e.g. trailing dots are trimmed).
+    ///
+    /// When displaying paths to the user, consider using [`to_winuser_path`][WinPathExt::to_winuser_path]
+    /// to display a user-friendly path.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// #[cfg(windows)]
+    /// {
+    ///     use omnipath::windows::WinPathExt;
+    ///     use std::path::Path;
+    ///
+    ///     let path = Path::new(r"C:\path\to\file.txt");
+    ///     assert_eq!(
+    ///         path.to_verbatim().unwrap(),
+    ///         Path::new(r"\\?\C:\path\to\file.txt")
+    ///     );
+    ///
+    ///     let path = Path::new(r"\\server\share\file.txt");
+    ///     assert_eq!(
+    ///         path.to_verbatim().unwrap(),
+    ///         Path::new(r"\\?\UNC\server\share\file.txt")
+    ///     );
+    ///
+    ///     let path = Path::new(r"\\.\pipe\name");
+    ///     assert_eq!(
+    ///         path.to_verbatim().unwrap(),
+    ///         Path::new(r"\\?\pipe\name")
+    ///     );
+    ///
+    ///     let path = Path::new(r"\\?\pipe\name");
+    ///     assert_eq!(
+    ///         path.to_verbatim().unwrap(),
+    ///         Path::new(r"\\?\pipe\name")
+    ///     );
+    /// }
+    /// ```
+    fn to_verbatim(&self) -> io::Result<PathBuf>;
 }
 impl WinPathExt for Path {
     fn win_absolute(&self) -> io::Result<PathBuf> {
@@ -161,6 +204,52 @@ impl WinPathExt for Path {
         } else {
             Ok(path.into())
         }
+    }
+
+    fn to_verbatim(&self) -> io::Result<PathBuf> {
+        if self.as_os_str().is_empty() {
+            return Err(io::Error::new(
+                io::ErrorKind::Other,
+                "an empty path cannot be made verbatim",
+            ));
+        }
+        if let Some(std::path::Component::Prefix(prefix)) = self.components().next() {
+            if prefix.kind().is_verbatim() {
+                return Ok(self.into());
+            }
+        }
+        let path = to_wide(self)?;
+        absolute_inner(&path, |mut absolute| {
+            const VERBATIM_PREFIX: &str = r"\\?\";
+            const UNC_PREFIX: &str = r"\\?\UNC\";
+            const COLON: u16 = ':' as u16;
+            const SEP: u16 = '\\' as u16;
+            const QUERY: u16 = '?' as u16;
+            const DOT: u16 = '.' as u16;
+
+            let prefix = match absolute {
+                // C:\ => \\?\C:\
+                [_, COLON, SEP, ..] => VERBATIM_PREFIX,
+                // \\.\ => \\?\
+                [SEP, SEP, DOT, SEP, ..] => {
+                    absolute = &absolute[4..];
+                    VERBATIM_PREFIX
+                }
+                // Leave \\?\ and \??\ as-is.
+                [SEP, SEP, QUERY, SEP, ..] | [SEP, QUERY, QUERY, SEP, ..] => "",
+                // \\ => \\?\UNC\
+                [SEP, SEP, ..] => {
+                    absolute = &absolute[2..];
+                    UNC_PREFIX
+                }
+                // Anything else we leave alone.
+                _ => "",
+            };
+            let path = OsString::from_wide(absolute);
+            let mut absolute = OsString::from(prefix);
+            absolute.push(path);
+            absolute.into()
+        })
     }
 }
 
