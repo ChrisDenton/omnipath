@@ -13,6 +13,13 @@ use std::vec::Vec;
 
 use super::kind::{ParsedUtf8Path, Win32Absolute, Win32Relative, WinPathKind};
 
+const VERBATIM_PREFIX: &str = r"\\?\";
+const UNC_PREFIX: &str = r"\\?\UNC\";
+const COLON: u16 = ':' as u16;
+const SEP: u16 = '\\' as u16;
+const QUERY: u16 = '?' as u16;
+const DOT: u16 = '.' as u16;
+
 /// [Windows only] Extension functions that use the Windows API to resolve paths.
 pub trait WinPathExt: Sealed {
     /// Makes the path absolute without resolving symlinks.
@@ -142,6 +149,42 @@ pub trait WinPathExt: Sealed {
     /// }
     /// ```
     fn to_verbatim(&self) -> io::Result<PathBuf>;
+
+    /// Convert to an exact verbatim path
+    ///
+    /// Unlike [`to_verbatim`][WinPathExt::to_verbatim], this will preserve the
+    /// exact path name, changing only the root of the path.
+    ///
+    /// Warning: This can be risky unless you really mean it. For example,
+    /// a `/` will be taken as a file named `/`. Similarly `.`, `..` will all
+    /// be treated as normal file names instead of being special.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// #[cfg(windows)]
+    /// {
+    ///     use omnipath::windows::WinPathExt;
+    ///     use std::path::Path;
+    ///
+    ///     // `.` and `..` will be interpreted as being normal file names.
+    ///     // So `..` is not the parent directory.
+    ///     let path = Path::new(r"C:\path.\to\.\..");
+    ///     assert_eq!(
+    ///         path.to_verbatim_exact().unwrap(),
+    ///         Path::new(r"\\?\C:\path.\to\.\..")
+    ///     );
+    ///
+    ///     // Using `NUL` in the path would usually redirect to
+    ///     // `\\.\NUL`. But converting to a verbatim path allows it.
+    ///     let path = Path::new(r"C:\path\to\NUL");
+    ///     assert_eq!(
+    ///         path.to_verbatim_exact().unwrap(),
+    ///         Path::new(r"\\?\C:\path\to\NUL")
+    ///     );
+    /// }
+    /// ```
+    fn to_verbatim_exact(&self) -> io::Result<PathBuf>;
 }
 impl WinPathExt for Path {
     fn win_absolute(&self) -> io::Result<PathBuf> {
@@ -235,13 +278,6 @@ impl WinPathExt for Path {
             path.push(0);
         }
         absolute_inner(&path, |mut absolute| {
-            const VERBATIM_PREFIX: &str = r"\\?\";
-            const UNC_PREFIX: &str = r"\\?\UNC\";
-            const COLON: u16 = ':' as u16;
-            const SEP: u16 = '\\' as u16;
-            const QUERY: u16 = '?' as u16;
-            const DOT: u16 = '.' as u16;
-
             let prefix = match absolute {
                 // C:\ => \\?\C:\
                 [_, COLON, SEP, ..] => VERBATIM_PREFIX,
@@ -268,6 +304,60 @@ impl WinPathExt for Path {
             absolute.push(path);
             absolute.into()
         })
+    }
+
+    fn to_verbatim_exact(&self) -> io::Result<PathBuf> {
+        if self.as_os_str().is_empty() {
+            return Err(io::Error::new(
+                io::ErrorKind::Other,
+                "an empty path cannot be made verbatim",
+            ));
+        }
+        if let Some(std::path::Component::Prefix(prefix)) = self.components().next() {
+            if prefix.kind().is_verbatim() {
+                return Ok(self.into());
+            }
+        }
+        let mut path = to_wide(self)?;
+        path.pop();
+        match &path[..] {
+            // Add the prefix
+            [_, COLON, SEP, ..] => {
+                let mut absolute = OsString::from(VERBATIM_PREFIX);
+                let path = OsString::from_wide(&path);
+                absolute.push(path);
+                Ok(absolute.into())
+            }
+            [SEP, SEP, DOT, SEP, ..] => {
+                path[2] = b'?' as u16;
+                Ok(OsString::from_wide(&path).into())
+            }
+            [SEP, SEP, QUERY, SEP, ..] | [SEP, QUERY, QUERY, SEP, ..] => Ok(self.into()),
+            [SEP, SEP, ..] => {
+                let mut absolute = OsString::from(UNC_PREFIX);
+                let path = OsString::from_wide(&path[2..]);
+                absolute.push(path);
+                Ok(absolute.into())
+            }
+            [SEP, ..] => absolute_inner(&[SEP, 0], |base| {
+                let mut abs = OsString::from_wide(base);
+                let mut iter = self.iter();
+                if iter.next().is_some() {
+                    abs.push(iter.as_path());
+                }
+                abs.into()
+            })?
+            .to_verbatim_exact(),
+            _ => absolute_inner(&[DOT, SEP, 0], |base| {
+                let mut abs = OsString::from_wide(base);
+                if !base.ends_with(&[b'\\' as u16]) {
+                    abs.push("\\");
+                }
+                abs.push(self);
+                abs.into()
+            })?
+            .to_verbatim_exact(),
+        }
     }
 }
 
